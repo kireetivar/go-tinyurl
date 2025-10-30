@@ -1,0 +1,36 @@
+# Go build and dependency files
+/bin/
+/build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace files
+*.log
+*.tmp
+*.swp
+
+# Dependency directories
+/vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Coverage files
+coverage*
+*.coverprofile
+
+# Module cache
+/go.sum
