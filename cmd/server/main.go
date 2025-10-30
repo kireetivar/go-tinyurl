@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/kireetivar/go-tinyurl/internal/handlers"
+	"github.com/kireetivar/go-tinyurl/internal/memory"
 )
 
 
 func main() {
-	var s = handlers.NewServer()
+	var m = memory.NewMemoryStore()
+	var s = handlers.NewServer(m)
 
 	mux := http.NewServeMux()
 
