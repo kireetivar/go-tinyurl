@@ -9,8 +9,7 @@ import (
 
 
 func main() {
-	var s handlers.Server
-	s.InMemory = make(map[string]handlers.ShortenRequest)
+	var s = handlers.NewServer()
 
 	mux := http.NewServeMux()
 
@@ -21,6 +20,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
+	log.Println("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 

@@ -95,3 +95,10 @@ func (s *Server) RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
 }
+
+func NewServer() *Server {
+	return &Server{
+		InMemory: make(map[string]ShortenRequest),
+		mut: sync.Mutex{},
+	}
+}
