@@ -5,13 +5,16 @@ import (
 	"net/http"
 
 	"github.com/kireetivar/go-tinyurl/internal/handlers"
-	"github.com/kireetivar/go-tinyurl/internal/memory"
+	"github.com/kireetivar/go-tinyurl/internal/storage"
 )
 
 
 func main() {
-	var m = memory.NewMemoryStore()
-	var s = handlers.NewServer(m)
+	store, err := storage.NewSQLiteStore("./shortener.db")
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+	var s = handlers.NewServer(store)
 
 	mux := http.NewServeMux()
 
