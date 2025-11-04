@@ -14,7 +14,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
-	var s = handlers.NewServer(store)
+	cache := storage.NewCachingStore(store)
+	var s = handlers.NewServer(cache)
 
 	mux := http.NewServeMux()
 

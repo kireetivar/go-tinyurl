@@ -34,3 +34,5 @@ coverage*
 
 # Module cache
 /go.sum
+
+*.db
