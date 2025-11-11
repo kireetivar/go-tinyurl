@@ -5,11 +5,16 @@ import (
 	"errors"
 	"log"
 
+	"github.com/kireetivar/go-tinyurl/internal/models"
 	"github.com/kireetivar/go-tinyurl/pkg/utils"
 	"github.com/mattn/go-sqlite3"
 )
 
 type SQLiteStore struct {
+	db *sql.DB
+}
+
+type sqliteUserStore struct {
 	db *sql.DB
 }
 
@@ -59,29 +64,86 @@ func (s *SQLiteStore) Get(shortKey string) (string,error) {
 	return longURL,nil
 }
 
+func (s *sqliteUserStore) Create(username, email, hashedPassword string) (int64, error) {
+	userCreate := `INSERT into users (username,email, hashed_password) VALUES (?,?,?)`
 
-func NewSQLiteStore(dataSourceName string) (*SQLiteStore, error) {
-	db, err := sql.Open("sqlite3", dataSourceName)
+	res, err := s.db.Exec(userCreate, username, email, hashedPassword)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to create user: %v", err)
+		return 0, err // Return 0 and the error
 	}
 
-	if err := db.Ping(); err != nil {
-		return nil, err
+	id,err := res.LastInsertId()
+	if err != nil {
+		log.Panicf("Failed to get last insert ID: %v", err)
+		return 0,err
 	}
 
-	statement := `CREATE TABLE IF NOT EXISTS urls (
+	return id,nil
+}
+
+func (s *sqliteUserStore) GetByUsername(username string) (*models.User, error) {
+	getUser := `SELECT userId, username, email, hashed_password FROM users WHERE username = ?`
+
+	var user models.User
+	err :=s.db.QueryRow(getUser, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.HashedPassword,
+	)
+	if err!= nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
+		log.Printf("ERROR while fetching user %s: %v", username, err)
+		return nil, err
+	}
+	return &user, nil
+}
+
+func NewSQLiteStore(db *sql.DB) (Storage, error) {
+	urlsTableStmt := `CREATE TABLE IF NOT EXISTS urls (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     short_key TEXT NOT NULL UNIQUE,
     long_url TEXT NOT NULL
 	);`
 
-	_, err = db.Exec(statement)
+	_, err := db.Exec(urlsTableStmt)
 	if err != nil {
 		return nil, err
 	}
 
-	return &SQLiteStore{
+	return  &SQLiteStore{
+		db: db,
+	},nil
+}
+
+func NewSQLiteUserStore(db *sql.DB) (UserStorage, error) {
+	usersTableStmt := `CREATE TABLE IF NOT EXISTS users (
+    userId INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    hashed_password TEXT NOT NULL
+    );`
+	_, err := db.Exec(usersTableStmt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sqliteUserStore{
 		db: db,
 	}, nil
+}
+
+
+func NewDB(dataSourceName string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", dataSourceName)
+	if err != nil {
+		return nil,err
+	}
+	if err := db.Ping(); err != nil {
+		return nil,err
+	}
+	return db,nil
 }

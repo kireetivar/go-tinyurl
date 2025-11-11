@@ -36,3 +36,4 @@ coverage*
 /go.sum
 
 *.db
+.env
