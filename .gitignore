@@ -32,8 +32,5 @@ Thumbs.db
 coverage*
 *.coverprofile
 
-# Module cache
-/go.sum
-
 *.db
 .env
