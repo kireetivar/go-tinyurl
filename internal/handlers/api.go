@@ -24,7 +24,7 @@ type Server struct {
 }
 
 type ShortenResponse struct {
-	Hash string
+	Hash string `json:"hash"`
 }
 
 type SignupRequest struct {
