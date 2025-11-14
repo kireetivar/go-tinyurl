@@ -12,6 +12,6 @@ RUN CGO_ENABLED go build -o /app/server ./cmd/server/main.go
 
 WORKDIR /
 
-COPY  --form=builder /app/server .
+COPY  --from=builder /app/server .
 
 CMD ["/server"]
