@@ -9,26 +9,26 @@ on:
 jobs:
   test:
     name: Run Unit Tests
-  
-  steps:
-  - name: Set up Go
-    uses: actions/setup-go@v5
-    with:
-      goversion: '1.22'
-  
-  - name: Check out code
-    uses: actions/checkout@v4
-  
-  - name: Run Tests
-    run: go test ./...
+    runs-on: ubuntu-latest
 
-deploy:
-  name: Deploy to Render
-  runs-on: ubuntu-latest
-  needs: test
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
 
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Check out code
+        uses: actions/checkout@v4
 
-  steps:
-  - name: Trigger Render Deploy Hook
-  run: curl "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      - name: Run Tests
+        run: go test ./...
+
+  deploy:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: curl "${{ secrets.RENDER_DEPLOY_HOOK }}"
