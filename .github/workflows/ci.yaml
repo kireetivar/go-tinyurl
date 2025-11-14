@@ -20,6 +20,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Download Dependencies
+        run: go mod download
+
       - name: Run Tests
         run: go test ./...
 
