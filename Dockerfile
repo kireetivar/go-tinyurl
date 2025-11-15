@@ -7,6 +7,7 @@ RUN go build -o server ./cmd/server
 
 
 FROM ubuntu:latest
-WORKDIR /
+WORKDIR /app
+RUN mkdir -p /app/data && chmod 777 /app/data
 COPY --from=builder /app/server .
-CMD ["/server"]
+CMD ["./server"]

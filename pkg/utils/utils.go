@@ -3,21 +3,23 @@ package utils
 import (
 	"crypto/rand"
 	"log"
+	"math/big"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func GenerateShortKey() string {
-	s := make([]byte, 6)
+	const keyLength = 6
+	alphabetLen := big.NewInt(int64(len(alphabet)))
+	result := make([]byte, keyLength)
 
-	_, err := rand.Read(s)
-	if err != nil {
-		log.Fatalln("err ", err)
+	for i := 0; i < keyLength; i++ {
+		num, err := rand.Int(rand.Reader, alphabetLen)
+		if err != nil {
+			log.Fatalln("err ", err)
+		}
+		result[i] = alphabet[num.Int64()]
 	}
 
-	for i := 0; i < 6; i++ {
-		s[i] = alphabet[int(s[i])%len(alphabet)]
-	}
-
-	return string(s)
+	return string(result)
 }
